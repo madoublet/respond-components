@@ -1,0 +1,22 @@
+{
+  "name": "respond-components",
+  "version": "1.0.0",
+  "description": "Polymer-based web components for Respond",
+  "main": "respond.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/madoublet/respond-components.git"
+  },
+  "author": "Matthew Smith",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/madoublet/respond-components/issues"
+  },
+  "homepage": "https://github.com/madoublet/respond-components#readme",
+  "devDependencies": {
+    "bower": "^1.7.7"
+  }
+}

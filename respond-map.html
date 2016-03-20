@@ -37,95 +37,144 @@
 </dom-module>
 
 <script>
+
   Polymer({
-	  	is: "respond-map",
-	
-	  	// element attributes
-	  	properties: {
-	  		address: { type: String },
-	  		zoom: { type: String }
-		},
-		
-		// attached
-		attached: function() {
-		
-			// labels
-			this.label = {
-				getDirections: this.i18n('Get Directions')
-			};
-			
-			// set url
-			this.url = 'http://maps.google.com/?q=' + this.address;
-		
-			// set zoom
-			var defaultZoom = 8;	
-	
-			if(this.zoom != 'auto' && this.zoom != undefined){
-				defaultZoom = parseInt(this.zoom);
-			}
-			
-			// create the map
-			var mapOptions = {
-				center: new google.maps.LatLng(38.6272, 90.1978),
-				zoom: defaultZoom,
-				mapTypeId: google.maps.MapTypeId.ROADMAP
-		    };
-		
-			// create the map              
-			var container = this.$.mapContainer;
-			
-			// create map and bounds
-		    var map = new google.maps.Map(container, mapOptions);
-		    
-			// look for a default address
-			if(this.address != null && this.address != undefined){
-			
-			    // geo-code the address
-			    var geocoder = new google.maps.Geocoder();
-			    
-			    var context = this;
-			    
-			    geocoder.geocode({'address': this.address}, function(results, status){
-				    
-			        if (status == google.maps.GeocoderStatus.OK){
-				        
-			            var latitude = results[0].geometry.location.lat();
-			            var longitude = results[0].geometry.location.lng();
-			            var content = results[0].formatted_address;
-			            
-			            var coords = new google.maps.LatLng(latitude, longitude);
-			            
-			            var infowindow = new google.maps.InfoWindow({
-					        content: content
-					    });
-			            
-			             // create marker				    
-			            var marktext = '<div>' + content + '</div>';
-			            
-					    var marker = new google.maps.Marker({
-					        position: coords,
-					        map: map,
-					        title: marktext
-					    });
-					    
-					    google.maps.event.addListener(marker, 'click', function() {
-					    	infowindow.open(map, marker);
-							});
-							
-						
-						map.setCenter(coords);
-	
-			        }
-			    
-			    });
-			    
-		    }
-		
-		},
-		
-		i18n: function(text){
-		  	return respond.site.i18n(text);
-		}
-	
-	});
+  
+    is: "respond-map",
+  
+    // element attributes
+    properties: {
+      address: {
+        type: String,
+        observer: '_addressChanged'
+      },
+      zoom: {
+        type: String,
+        observer: '_zoomChanged'
+      }
+    },
+  
+    /**
+     * Displays the component
+     */
+    ready: function() {
+  
+      // labels
+      this.label = {
+        getDirections: this.i18n('Get Directions')
+      };
+  
+      // set url
+      this.url = 'http://maps.google.com/?q=' + this.address;
+  
+      // set zoom
+      var defaultZoom = 8;
+  
+      if (this.zoom != 'auto' && this.zoom != undefined) {
+        defaultZoom = parseInt(this.zoom);
+      }
+  
+      // create the map
+      var mapOptions = {
+        center: new google.maps.LatLng(38.6272, 90.1978),
+        zoom: defaultZoom,
+        mapTypeId: google.maps.MapTypeId.ROADMAP
+      };
+  
+      // create the map              
+      var container = this.$.mapContainer;
+  
+      // create map and bounds
+      this.map = new google.maps.Map(container, mapOptions);
+  
+      this.setLocation();
+  
+    },
+    
+    /**
+     * Handles updating the view when the address changes
+     * @param {String} newValue the new value of the attribute
+     * @param {String} oldValue the old value of the attribute
+     */
+    _addressChanged: function(newValue, oldValue) {
+    
+      this.setLocation();
+      
+    },
+    
+    /**
+     * Handles updating the view when the zoom changes
+     * @param {String} newValue the new value of the attribute
+     * @param {String} oldValue the old value of the attribute
+     */
+    _zoomChanged: function(newValue, oldValue) {
+    
+      if(this.map != undefined){
+        this.map.setZoom(parseInt(newValue));
+      }
+      
+    },
+    
+    /**
+     * Sets the location on the map (this.map) to the current address (this.address)
+     */
+    setLocation: function(){
+    
+      // look for a default address
+      if (this.address != null && this.address != undefined) {
+  
+        // geo-code the address
+        var geocoder = new google.maps.Geocoder();
+  
+        var context = this;
+  
+        geocoder.geocode({
+          'address': this.address
+        }, function(results, status) {
+  
+          if (status == google.maps.GeocoderStatus.OK) {
+  
+            var latitude = results[0].geometry.location.lat();
+            var longitude = results[0].geometry.location.lng();
+            var content = results[0].formatted_address;
+  
+            var coords = new google.maps.LatLng(latitude, longitude);
+  
+            var infowindow = new google.maps.InfoWindow({
+              content: content
+            });
+  
+            // create marker				    
+            var marktext = '<div>' + content + '</div>';
+  
+            var marker = new google.maps.Marker({
+              position: coords,
+              map: context.map,
+              title: marktext
+            });
+  
+            google.maps.event.addListener(marker, 'click', function() {
+              infowindow.open(map, marker);
+            });
+  
+  
+            context.map.setCenter(coords);
+  
+          }
+  
+        });
+  
+      }
+      
+    },
+    
+    /**
+     * Translates the string
+     */
+    i18n: function(text) {
+      return respond.site.i18n(text);
+    }
+  
+  });
+
 </script>

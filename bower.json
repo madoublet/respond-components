@@ -1,0 +1,21 @@
+{
+  "name": "respond-components",
+  "description": "Polymer-based web components for Respond",
+  "main": "respond.html",
+  "authors": [
+    "Matthew Smith"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/madoublet/respond-components",
+  "moduleType": [],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.3.1"
+  }
+}
