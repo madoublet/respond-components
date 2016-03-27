@@ -1,37 +1,57 @@
 <dom-module id="respond-list">
 
     <style>
-        /* editor display */
-        .editor-display {
-          position: relative;
-          padding: 0 0 0 60px;
-          min-height: 50px;
+        div {
+          display: none;
         }
-
-        .editor-display .icon {
-          position: absolute;
-          top: 15px;
-          left: 5px;
+    
+        div[visible] {
           display: block;
-          width: 40px;
-          height: 40px;
-          line-height: 40px;
-          text-align: center;
-          border-radius: 50%;
-          background-color: #ddd;
-          color: #fff;
         }
-
-        .editor-display svg{
-          fill: currentColor;
-          margin: 7px 0 0 0;
-        }
-
-        .editor-display p{
+    
+        /* edit display */
+        .edit {
+          position: relative;
+          padding: 10px 0;
           margin: 0;
-          padding: 18px 0 0 0;
+          min-height: 70px;
+          background-color: #f8f8f8;
+          border: 1px solid #f0f0f0;
+          text-align: center;
         }
 
+        .edit .icon {
+          display: inline-block;
+          text-align: center;
+          color: #ddd;
+        }
+
+        .edit svg{
+          fill: currentColor;
+          width: 35px;
+          height: 35px;
+        }
+
+        .edit .title{
+          font-family: 'Open Sans', sans-serif;
+          font-weight: normal;
+          font-size: 14px;
+          display: block;
+          margin: 0 0 10px 0;
+          color: #555;
+        }
+        
+        .edit .description{
+          font-family: 'Open Sans', sans-serif;
+          font-weight: normal;
+          font-size: 12px;
+          display: block;
+          margin: 5px 0 10px 0;
+          padding: 0;
+          color: #888;
+        }
+        
+        /* actions */
         .list-actions {
             margin: 15px 0 25px 0;
             padding: 0;
@@ -103,21 +123,25 @@
     </style>
 
     <template>
+    
+    <div class="edit" visible$="{{edit}}">
+      <span class="icon"><svg xmlns="http://www.w3.org/2000/svg" fill="#000000" height="24" viewBox="0 0 24 24" width="24"><path d="M4 14h4v-4H4v4zm0 5h4v-4H4v4zM4 9h4V5H4v4zm5 5h12v-4H9v4zm0 5h12v-4H9v4zM9 5v4h12V5H9z"/><path d="M0 0h24v24H0z" fill="none"/></svg></span><span class="title">List Component</span>
+    </div>
 
-		<div id="items"></div>
+		<div id="items" visible$="{{!edit}}"></div>
 		<!-- /#items -->
 
-		<div id="actions" class="list-actions">
+		<div id="actions" class="list-actions" visible$="{{!edit}}">
 
 			<span class="pager" visible$="{{showPager}}">
 				<template id="pager" is="dom-repeat" items="{{list}}">
 					<a on-click="gotoPage" active$="{{item.isActive}}">{{item.title}}</a>
 				</template>
-    </span>
+      </span>
 
-    <button on-click="previousPage" visible$="{{showPrevious}}" title=$="{{label.previous}}"><svg viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet"><g><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></g></svg></button>
+      <button on-click="previousPage" visible$="{{showPrevious}}" title=$="{{label.previous}}"><svg viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet"><g><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></g></svg></button>
 
-    <button on-click="nextPage" visible$="{{showNext}}" title=$="{{label.next}}"><svg viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet"><g><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></g></svg></button>
+      <button on-click="nextPage" visible$="{{showNext}}" title=$="{{label.next}}"><svg viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet"><g><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></g></svg></button>
 
     </div>
     <!-- /#actions -->
@@ -131,7 +155,11 @@
 
         // element attributes
         properties: {
-            type: {
+            edit: {
+              type: Boolean,
+              value: true
+            },
+            url: {
                 type: String
             },
             display: {
@@ -145,9 +173,6 @@
             },
             pageresults: {
                 type: String
-            },
-            tag: {
-                type: String
             }
         },
 
@@ -159,6 +184,9 @@
                 previous: this.i18n('Previous'),
                 next: this.i18n('Next'),
             };
+            
+            // edit mode
+            this.edit = false;
 
             // get page information
             this.pageId = document.body.getAttribute('page');
@@ -185,15 +213,12 @@
                 this.tag = '';
             }
 
-            if(document.body.hasAttribute('hashedit-active')) {
-              var div = document.createElement('div');
-              div.setAttribute('class', 'editor-display');
-
-              div.innerHTML = '<span class="icon"><svg xmlns="http://www.w3.org/2000/svg" fill="#000000" height="24" viewBox="0 0 24 24" width="24"><path d="M4 14h4v-4H4v4zm0 5h4v-4H4v4zM4 9h4V5H4v4zm5 5h12v-4H9v4zm0 5h12v-4H9v4zM9 5v4h12V5H9z"/><path d="M0 0h24v24H0z" fill="none"/></svg></span><p>Lists <b>/' + this.type + '</b> as a ' + this.display.split('-')[1] + '</p>';
-
-              Polymer.dom(this.$.items).appendChild(div);
+            if(document.body.hasAttribute('edit')) {
+              this.edit = true;
             }
             else{
+              this.edit = false;
+              
               // build the list of pages
               this.buildList(this.currentIndex);
             }
@@ -274,11 +299,10 @@
             // set params
             var params = {
                 siteId: this.siteId,
-                type: this.type,
+                url: this.url,
                 pagesize: this.pagesize,
                 current: this.current,
-                orderby: this.orderby,
-                tag: this.tag
+                orderby: this.orderby
             }
 
             // set current index
@@ -316,12 +340,12 @@
 
                     context.list = JSON.parse(xhr.responseText);
 
-                    // filter array by type
+                    // filter array by url
                     context.list = context.list.filter(function(value){
 
-                      var type = params.type;
+                      var url = params.url;
 
-                      if(value.Url.substring(0, type.length) === params.type) {
+                      if(value.Url.substring(0, url.length) === url) {
                         return true;
                       }
 
@@ -331,21 +355,32 @@
                     for (x = (params.current * params.pagesize); x < params.pagesize; x++) {
 
                         // setup callout
-                        var callout = context.list[x].Callout;
+                        var callout = '';
+                        
+                        if(context.list[x].Callout != null) {
+                          callout = context.list[x].Callout;
+                        }
 
                         // set photo
                         var photo = '';
 
                         if (context.list[x].Photo != null) {
-                            photo = context.list[x].Photo;
+                          photo = context.list[x].Photo;
+                        }
+                        
+                        // set thumb
+                        var thumb = '';
+                        
+                        if (context.list[x].Thumb != null) {
+                          thumb = context.list[x].Thumb;
                         }
 
                         // create a list item
                         var item = document.createElement('respond-list-item');
                         item.setAttribute('display', context.display);
-                        item.setAttribute('thumb', context.list[x].Thumb);
+                        item.setAttribute('thumb', thumb);
                         item.setAttribute('url', context.list[x].Url);
-                        item.setAttribute('name', context.list[x].Name);
+                        item.setAttribute('title', context.list[x].Title);
                         item.setAttribute('callout', callout);
                         item.setAttribute('description', context.list[x].Description);
                         item.setAttribute('photo', photo);

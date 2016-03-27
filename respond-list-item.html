@@ -116,7 +116,7 @@
 	  		display: { type: String },
 	  		thumb: { type: String },
 	  		url: { type: String },
-	  		name: { type: String },
+	  		title: { type: String },
 	  		callout: { type: String },
 	  		description: { type: String },
 	  		photo: { type: String },
@@ -172,7 +172,7 @@
 
 				// set title
 				var h4 = document.createElement('h4');
-				h4.innerHTML = this.name;
+				h4.innerHTML = this.title;
 
 				// append h4
 				a.appendChild(h4);
@@ -211,7 +211,7 @@
 				// set link
 				var a = document.createElement('a');
 				a.setAttribute('href', this.url);
-				a.innerHTML = this.name;
+				a.innerHTML = this.title;
 
 				// append a
 				h4.appendChild(a);
