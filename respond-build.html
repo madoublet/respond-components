@@ -7779,11 +7779,11 @@ this.fire('dom-change');
         div {
           display: none;
         }
-    
+
         div[visible] {
           display: block;
         }
-    
+
         /* edit display */
         .edit {
           position: relative;
@@ -7815,7 +7815,7 @@ this.fire('dom-change');
           margin: 0 0 10px 0;
           color: #555;
         }
-        
+
         .edit .description{
           font-family: 'Open Sans', sans-serif;
           font-weight: normal;
@@ -7825,7 +7825,7 @@ this.fire('dom-change');
           padding: 0;
           color: #888;
         }
-        
+
         /* actions */
         .list-actions {
             margin: 15px 0 25px 0;
@@ -7898,7 +7898,7 @@ this.fire('dom-change');
     </style>
 
     <template>
-    
+
     <div class="edit" visible$="{{edit}}">
       <span class="icon"><svg xmlns="http://www.w3.org/2000/svg" fill="#000000" height="24" viewBox="0 0 24 24" width="24"><path d="M4 14h4v-4H4v4zm0 5h4v-4H4v4zM4 9h4V5H4v4zm5 5h12v-4H9v4zm0 5h12v-4H9v4zM9 5v4h12V5H9z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span><span class="title">List Component</span>
     </div>
@@ -7951,7 +7951,7 @@ this.fire('dom-change');
             }
         },
 
-        // attached
+        // ready
         ready: function() {
 
             // set labels
@@ -7959,7 +7959,7 @@ this.fire('dom-change');
                 previous: this.i18n('Previous'),
                 next: this.i18n('Next'),
             };
-            
+
             // edit mode
             this.edit = false;
 
@@ -7993,7 +7993,7 @@ this.fire('dom-change');
             }
             else{
               this.edit = false;
-              
+
               // build the list of pages
               this.buildList(this.currentIndex);
             }
@@ -8131,7 +8131,7 @@ this.fire('dom-change');
 
                         // setup callout
                         var callout = '';
-                        
+
                         if(context.list[x].Callout != null) {
                           callout = context.list[x].Callout;
                         }
@@ -8142,10 +8142,10 @@ this.fire('dom-change');
                         if (context.list[x].Photo != null) {
                           photo = context.list[x].Photo;
                         }
-                        
+
                         // set thumb
                         var thumb = '';
-                        
+
                         if (context.list[x].Thumb != null) {
                           thumb = context.list[x].Thumb;
                         }
@@ -8154,15 +8154,15 @@ this.fire('dom-change');
                         var item = document.createElement('respond-list-item');
                         item.setAttribute('display', context.display);
                         item.setAttribute('thumb', thumb);
-                        item.setAttribute('url', context.list[x].Url);
-                        item.setAttribute('title', context.list[x].Title);
+                        item.setAttribute('url', context.list[x].url);
+                        item.setAttribute('title', context.list[x].title);
                         item.setAttribute('callout', callout);
-                        item.setAttribute('description', context.list[x].Description);
+                        item.setAttribute('description', context.list[x].description);
                         item.setAttribute('photo', photo);
-                        item.setAttribute('first', context.list[x].FirstName);
-                        item.setAttribute('last', context.list[x].LastName);
-                        item.setAttribute('date', context.list[x].LastModified);
-                        item.setAttribute('url', context.list[x].Url);
+                        item.setAttribute('first', context.list[x].firstName);
+                        item.setAttribute('last', context.list[x].lastName);
+                        item.setAttribute('date', context.list[x].lastModified);
+                        item.setAttribute('url', context.list[x].url);
 
                         // append list item to the dom
                         Polymer.dom(context.$.items).appendChild(item);
@@ -8971,7 +8971,58 @@ this.fire('dom-change');
 
 	<style>
 
-		/* messages */
+  	.respond-edit, .respond-container {
+    	display: none;
+  	}
+
+  	.respond-edit[visible], .respond-container[visible] {
+    	display: block;
+    	visibility: visible;
+  	}
+
+		/* edit display */
+    .respond-edit {
+      position: relative;
+      padding: 10px 0;
+      margin: 0;
+      min-height: 70px;
+      background-color: #f8f8f8;
+      border: 1px solid #f0f0f0;
+      text-align: center;
+    }
+
+    .respond-edit .icon {
+      display: inline-block;
+      text-align: center;
+      color: #ddd;
+    }
+
+    .respond-edit svg{
+      fill: currentColor;
+      width: 35px;
+      height: 35px;
+    }
+
+    .respond-edit .title{
+      font-family: 'Open Sans', sans-serif;
+      font-weight: normal;
+      font-size: 14px;
+      display: block;
+      margin: 0 0 10px 0;
+      color: #555;
+    }
+
+    .respond-edit .description{
+      font-family: 'Open Sans', sans-serif;
+      font-weight: normal;
+      font-size: 12px;
+      display: block;
+      margin: 5px 0 10px 0;
+      padding: 0;
+      color: #888;
+    }
+
+    /* messages */
 		.success, .error{
 			display: none;
 			background-color: #fff;
@@ -8980,23 +9031,23 @@ this.fire('dom-change');
 			font-size: 16px;
 			margin: 0 0 0 15px;
 		}
-		
+
 			.success[visible], .error[visible]{
 				display: inline-block;
 			}
-		
+
 		.error{
 			border: 1px solid #CF4647;
 			color: #fff;
 			background-color: #CF4647;
 		}
-		
+
 		.success{
 			border: 1px solid #08B168;
 			color: #fff;
 			background-color: #08B168;
 		}
-		
+
 		/* loading */
 		.loading{
 			display: none;
@@ -9007,11 +9058,11 @@ this.fire('dom-change');
 			margin-top: 5px;
 			margin-left: 5px;
 		}
-		
+
 			.loading[visible]{
 				display: inline-block;
 			}
-		
+
 			.loading svg{
 				display: block;
 				vertical-align: top;
@@ -9025,104 +9076,137 @@ this.fire('dom-change');
 			  	text-align: center;
 			  	fill: currentColor;
 			}
-		
+
+
 	</style>
 
 	<template>
-	
-		<div id="container">
+
+		<div class="respond-edit" visible$="{{edit}}">
+
+      <span class="icon"><svg xmlns="http://www.w3.org/2000/svg" fill="#000000" height="24" viewBox="0 0 24 24" width="24">
+          <path d="M0 0h24v24H0z" fill="none"></path>
+          <path d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.11 0 2-.9 2-2V5c0-1.1-.89-2-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"></path>
+      </svg></span>
+
+      <span class="title">Form Component</span>
+
+    </div>
+    
+
+    <div class="respond-container" visible$="{{!edit}}">
+
 	    	<form id$="{{formid}}">
-	    		<content id="content"></content>
+	    		<div id="fields"></div>
+
+	    		<button type="button" class="btn btn-primary" on-click="submitForm">{{submit}}</button>
+
+      		<span class="loading" visible$="{{loading}}">
+      			
+      			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><g><path opacity=".25" d="M16 0 A16 16 0 0 0 16 32 A16 16 0 0 0 16 0 M16 4 A12 12 0 0 1 16 28 A12 12 0 0 1 16 4"></path><path d="M16 0 A16 16 0 0 1 32 16 L28 16 A12 12 0 0 0 16 4z"><animateTransform attributeName="transform" type="rotate" from="0 16 16" to="360 16 16" dur="0.8s" repeatCount="indefinite"></animateTransform></path></g></svg>
+      		</span>
+
+      		<span class="success" visible$="{{showSuccess}}">{{success}}</span>
+
+      		<span class="error" visible$="{{showError}}">{{error}}</span>
+          
+
 	    	</form>
-	    </div>
-	
-		<button type="button" class="btn btn-primary" on-click="submitForm">{{submit}}</button>
-			
-		<span class="loading" visible$="{{loading}}">
-			 
-			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><g><path opacity=".25" d="M16 0 A16 16 0 0 0 16 32 A16 16 0 0 0 16 0 M16 4 A12 12 0 0 1 16 28 A12 12 0 0 1 16 4"></path><path d="M16 0 A16 16 0 0 1 32 16 L28 16 A12 12 0 0 0 16 4z"><animateTransform attributeName="transform" type="rotate" from="0 16 16" to="360 16 16" dur="0.8s" repeatCount="indefinite"></animateTransform></path></g></svg>
-		</span>
-		
-		<span class="success" visible$="{{showSuccess}}">{{success}}</span>
-		
-		<span class="error" visible$="{{showError}}">{{error}}</span>
-	
+
+	  </div>
+
 	</template>
+
 </dom-module>
 
 <script>
   Polymer({
 	  	is: "respond-form",
-	
+
 	  	// element attributes
 	  	properties: {
-	  		formid: { type: String },
+  	  	edit: {
+              type: Boolean,
+              value: true
+            },
 	  		type: { type: String },
-	  		action: { type: String },
-	  		success: { 
-	  			type: String, 
+	  		success: {
+	  			type: String,
 	  			value: 'Form submitted successfully'
 	  		},
-	  		error: { 
-	  			type: String, 
-	  			value: 'There was an error submitting your form' 
+	  		error: {
+	  			type: String,
+	  			value: 'There was an error submitting your form'
 	  		},
-	  		submit: { 
+	  		submit: {
 	  			type: String,
 	  			value: 'Submit'
 	  		}
 		},
-		
+
 		// attached
-		attached: function() {
-		
-			// defaults
+		ready: function() {
+
+			// edit mode
+      this.edit = false;
+
+      if(document.body.hasAttribute('edit')) {
+        this.edit = true;
+      }
+
+      // defaults
 			this.loading = false;
 			this.showSuccess = false;
 			this.showError = false;
-		
+
+			// set fields
+			this.fields = [];
+
 			// translate messages
 			this.success = this.i18n(this.success);
 			this.error = this.i18n(this.error);
 			this.submit = this.i18n(this.submit);
+
+			// build form
+			this.buildForm();
+
 		},
-		
+
 		// handles the form submit
-		submitForm: function(event, detail, sender){
-			
+		submitForm: function(event, detail, sender) {
+
 			// init messages
 			this.showSuccess = false;
 			this.showError = false;
 			this.loading = false;
-			
+
 			// select all inputs in the local DOM
-			var groups = Polymer.dom(this).querySelectorAll('.form-group');
-			
+			var groups = Polymer.dom(this.$.fields).querySelectorAll('.form-group');
+
 			// initialize params
 			var params = {};
-			
+
 			// get page information
-			var pageId = document.body.getAttribute('page');
 			var siteId = respond.site.settings.SiteId;
 			var api = respond.site.settings.API;
-			
+
 			// add page and site
-			params['pageId'] = pageId;
+			params['page'] = window.location.href;
 			params['siteId'] = siteId;
-			params['formId'] = this.formid;
-			
+			params['formId'] = this.type;
+
 			// walk through inputs
-			for(x=0; x<groups.length; x++){
-				
+			for(x=0; x<groups.length; x++) {
+
 				// get name, id, type
 				var label = groups[x].getAttribute('data-label');
 				var id = groups[x].getAttribute('data-id');
 				var type = groups[x].getAttribute('data-type');
 				var required = groups[x].getAttribute('data-required');
-				
+
 				// get value by type
 				var value = '';
-				
+
 				if(type == 'text'){
 					value = groups[x].querySelector('input').value;
 				}
@@ -9131,7 +9215,7 @@ this.fire('dom-change');
 				}
 				else if(type == 'radiolist'){
 					var radio = groups[x].querySelector('input[type=radio]:checked');
-					
+
 					if(radio != null){
 						value = radio.value;
 					}
@@ -9141,45 +9225,45 @@ this.fire('dom-change');
 				}
 				else if(type == 'checkboxlist'){
 					var checkboxes = groups[x].querySelectorAll('input[type=checkbox]:checked');
-					
+
 					// create comma separated list
 					for(y=0; y<checkboxes.length; y++){
 						value += checkboxes[y].value + ', ';
 					}
-					
+
 					// remove trailing comma and space
 					if(value != ''){
 						value = value.slice(0, -2);
 					}
 				}
-				
+
 				params[id] = value;
-				
+
 				// check required fields
 				if(required == 'true' && value == ''){
 					this.showError = true;
 					groups[x].className += ' has-error';
 				}
-				
+
 			}
-			
+
 			// exit if error
-			if(this.showError == true){
+			if(this.showError == true) {
 				return false;
 			}
-			
+
 			// set loading
 			this.loading = true;
-			
+
 			// set context
 			var context = this;
-			
+
 			// submit form
 			var xhr = new XMLHttpRequest();
-			
+
 			// set URI
 			var uri = api + '/form';
-			
+
 			xhr.open('POST', encodeURI(uri));
 			xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 			xhr.onload = function() {
@@ -9194,65 +9278,114 @@ this.fire('dom-change');
 			        console.log('[respond.error] respond-form component: failed post, xhr.status='+xhr.status);
 			    }
 			};
-			
+
 			// serialize the data
 		    var qs = [];
-		    
+
 		    for(p in params){
 			    qs.push(encodeURIComponent(p) + "=" + encodeURIComponent(params[p]));
 		    }
-		    
+
 		    qs = qs.join("&");
-		    
+
 			// send serialized data
 			xhr.send(encodeURI(qs));
-			
+
 		},
-		
+
 		// clears the form on submit
-		clearForm:function(){
-		
+		clearForm:function() {
+
 			// clear text fields
 			var els = Polymer.dom(this).querySelectorAll('input[type=text]');
-			
+
 			for(x=0; x<els.length; x++){
 				els[x].value = '';
 			}
-			
+
 			// clear text ares
 			var els = this.querySelectorAll('textarea');
-			
+
 			for(x=0; x<els.length; x++){
 				els[x].value = '';
 			}
-			
+
 			// clear checkboxes
 			var els = Polymer.dom(this).querySelectorAll('input[type=checkbox]');
-			
+
 			for(x=0; x<els.length; x++){
 				els[x].checked = false;
 			}
-			
+
 			// clear radios
 			var els = Polymer.dom(this).querySelectorAll('input[type=radio]');
-			
+
 			for(x=0; x<els.length; x++){
 				els[x].checked = false;
 			}
-			
+
 			// reset selects
 			var els = Polymer.dom(this).querySelectorAll('select');
-			
+
 			for(x=0; x<els.length; x++){
 				els[x].selectedIndex = 0;
 			}
-			
+
 		},
-		
-		i18n: function(text){
+
+    // builds the form
+		buildForm: function() {
+
+  		var context = this, json;
+
+      // submit form
+      var xhr = new XMLHttpRequest();
+
+      // set URI
+      var uri = 'data/forms/' + this.type + '.json';
+
+      xhr.open('GET', uri, true);
+
+      xhr.onload = function() {
+        if (xhr.status === 200) {
+
+          json = JSON.parse(xhr.responseText);
+
+          context.fields = json.fields;
+
+          for(x=0; x<context.fields.length; x++) {
+
+            // create a list item
+            var item = document.createElement('respond-form-field');
+            item.setAttribute('fieldid', context.fields[x].id);
+            item.setAttribute('label', context.fields[x].label);
+            item.setAttribute('type', context.fields[x].type);
+            item.setAttribute('required', context.fields[x].required);
+            item.setAttribute('options', context.fields[x].options);
+            item.setAttribute('helperText', context.fields[x].helperText);
+            item.setAttribute('placeholder', context.fields[x].placeholder);
+            item.setAttribute('cssClass', context.fields[x].cssClass);
+
+            // append list item to the dom
+            Polymer.dom(context.$.fields).appendChild(item);
+
+          }
+
+        } else if (xhr.status !== 200) {
+          context.loading = false;
+          console.log('[respond.error] respond-list-blog component: failed post, xhr.status=' + xhr.status);
+        }
+      };
+
+      // send request
+      xhr.send();
+
+		},
+
+		i18n: function(text) {
 			return respond.site.i18n(text);
 		}
-	
+
 	});
 </script><dom-module id="respond-form-field" assetpath="/">
 	<template>
