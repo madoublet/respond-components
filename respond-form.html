@@ -214,17 +214,17 @@
 			// select all inputs in the local DOM
 			var groups = Polymer.dom(this.$.fields).querySelectorAll('.form-group');
 
-			// initialize params
-			var params = {};
-
 			// get page information
-			var siteId = respond.site.settings.SiteId;
-			var api = respond.site.settings.API;
-
-			// add page and site
-			params['page'] = window.location.href;
-			params['siteId'] = siteId;
-			params['formId'] = this.type;
+			var siteId = respond.site.settings.id;
+			var api = respond.site.settings.api;
+			
+			// create submission
+			var submission = {
+  			url: window.location.href,
+  			siteId: siteId,
+  			formId: this.type,
+  			fields: []
+			};
 
 			// walk through inputs
 			for(x=0; x<groups.length; x++) {
@@ -267,8 +267,13 @@
 						value = value.slice(0, -2);
 					}
 				}
-
-				params[id] = value;
+				
+				submission.fields.push(
+				  {
+  				  id: id,
+  				  value: value
+				  }
+				);
 
 				// check required fields
 				if(required == 'true' && value == ''){
@@ -293,10 +298,11 @@
 			var xhr = new XMLHttpRequest();
 
 			// set URI
-			var uri = api + '/form';
+			var uri = api + '/submissions/add';
 
 			xhr.open('POST', encodeURI(uri));
-			xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+			
+			// handle success
 			xhr.onload = function() {
 			    if(xhr.status === 200){
 			    	// clear form, hide loading
@@ -310,17 +316,8 @@
 			    }
 			};
 
-			// serialize the data
-		    var qs = [];
-
-		    for(p in params){
-			    qs.push(encodeURIComponent(p) + "=" + encodeURIComponent(params[p]));
-		    }
-
-		    qs = qs.join("&");
-
 			// send serialized data
-			xhr.send(encodeURI(qs));
+			xhr.send(JSON.stringify(submission));
 
 		},
 
