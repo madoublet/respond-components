@@ -127,8 +127,8 @@
 
     <div class="respond-container" visible$="{{!edit}}">
 
-	    	<form id$="{{formid}}">
-	    		<div id="fields"></div>
+	    	<form id$="{{id}}">
+	    		<content id="content"></content>
 
 	    		<button type="button" class="btn btn-primary" on-click="submitForm">{{submit}}</button>
 
@@ -160,7 +160,7 @@
               type: Boolean,
               value: true
             },
-	  		type: { type: String },
+	  		id: { type: String },
 	  		success: {
 	  			type: String,
 	  			value: 'Form submitted successfully'
@@ -198,9 +198,6 @@
 			this.error = this.i18n(this.error);
 			this.submit = this.i18n(this.submit);
 
-			// build form
-			this.buildForm();
-
 		},
 
 		// handles the form submit
@@ -217,7 +214,7 @@
 			// get page information
 			var siteId = respond.site.settings.id;
 			var api = respond.site.settings.api;
-			
+
 			// create submission
 			var submission = {
   			url: window.location.href,
@@ -267,7 +264,7 @@
 						value = value.slice(0, -2);
 					}
 				}
-				
+
 				submission.fields.push(
 				  {
   				  id: id,
@@ -301,7 +298,7 @@
 			var uri = api + '/submissions/add';
 
 			xhr.open('POST', encodeURI(uri));
-			
+
 			// handle success
 			xhr.onload = function() {
 			    if(xhr.status === 200){
@@ -361,55 +358,7 @@
 
 		},
 
-    // builds the form
-		buildForm: function() {
-
-  		var context = this, json;
-
-      // submit form
-      var xhr = new XMLHttpRequest();
-
-      // set URI
-      var uri = 'data/forms/' + this.type + '.json';
-
-      xhr.open('GET', uri, true);
-
-      xhr.onload = function() {
-        if (xhr.status === 200) {
-
-          json = JSON.parse(xhr.responseText);
-
-          context.fields = json.fields;
-
-          for(x=0; x<context.fields.length; x++) {
-
-            // create a list item
-            var item = document.createElement('respond-form-field');
-            item.setAttribute('fieldid', context.fields[x].id);
-            item.setAttribute('label', context.fields[x].label);
-            item.setAttribute('type', context.fields[x].type);
-            item.setAttribute('required', context.fields[x].required);
-            item.setAttribute('options', context.fields[x].options);
-            item.setAttribute('helperText', context.fields[x].helperText);
-            item.setAttribute('placeholder', context.fields[x].placeholder);
-            item.setAttribute('cssClass', context.fields[x].cssClass);
-
-            // append list item to the dom
-            Polymer.dom(context.$.fields).appendChild(item);
-
-          }
-
-        } else if (xhr.status !== 200) {
-          context.loading = false;
-          console.log('[respond.error] respond-list-blog component: failed post, xhr.status=' + xhr.status);
-        }
-      };
-
-      // send request
-      xhr.send();
-
-		},
-
+    // handles translations
 		i18n: function(text) {
 			return respond.site.i18n(text);
 		}
