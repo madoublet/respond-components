@@ -40,10 +40,6 @@
 
                     var data = xhr.responseText;
 
-                    // replace imagesURL with url
-                    data = respond.site.replaceAll(data, '{{site.ImagesUrl}}', respond.site.settings.ImagesUrl);
-                    data = respond.site.replaceAll(data, '{{site.ImagesURL}}', respond.site.settings.ImagesUrl);
-
                     // place returned HTML into a node
                     var div = document.createElement('div');
 

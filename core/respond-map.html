@@ -6,19 +6,19 @@
 			margin: 0 0 25px 0;
 		  padding: 0;
 		}
-		
+
 		.respond-map-container .map-container{
 			width: 100%;
 		  	height: 200px;
 		  	border: 1px solid #ddd;
 		  	margin-bottom: 5px;
 		}
-		
+
 		.respond-map-container p{
 			margin: 0 0 5px 0;
 		  padding: 0;
 		}
-		
+
 		.respond-map-container a, .respond-map-container a:visited, .respond-map-container a:hover{
 			text-decoration: none;
 		}
@@ -34,16 +34,16 @@
 				</p>
 			</div>
 		</div>
-		
+
 	</template>
 </dom-module>
 
 <script>
 
   Polymer({
-  
+
     is: "respond-map",
-  
+
     // element attributes
     properties: {
       edit: {
@@ -59,159 +59,154 @@
         observer: '_zoomChanged'
       }
     },
-  
+
     /**
      * Displays the component
      */
     ready: function() {
-  
+
       // labels
       this.label = {
         getDirections: this.i18n('Get Directions')
       };
-      
+
       // setup the map
       this.setupMap();
       this.setLocation();
-      
+
     },
-  
-    
+
+
     /**
      * Handles updating the view when the address changes
      * @param {String} newValue the new value of the attribute
      * @param {String} oldValue the old value of the attribute
      */
     _addressChanged: function(newValue, oldValue) {
-    
-      if(this.map == null || this.map == undefined){ 
-      
+
+      if(this.map == null || this.map == undefined){
+
         // this fixes a render bug when a new map is dragged from the editor onto the page
         context = this;
-           
+
         setTimeout(function(){
           context.setupMap();
         }, 100);
-        
+
       }
-     
+
       this.setLocation();
-      
+
     },
-    
+
     /**
      * Handles updating the view when the zoom changes
      * @param {String} newValue the new value of the attribute
      * @param {String} oldValue the old value of the attribute
      */
     _zoomChanged: function(newValue, oldValue) {
-    
+
       if(this.map != undefined){
         this.map.setZoom(parseInt(newValue));
       }
-      
+
     },
-    
+
     /**
       * Setup map
       */
     setupMap: function() {
-      
+
       // set url
       this.url = 'http://maps.google.com/?q=' + this.address;
-      
+
       // set zoom
       var defaultZoom = 8;
-  
+
       if (this.zoom != 'auto' && this.zoom != undefined) {
         defaultZoom = parseInt(this.zoom);
       }
-  
+
       // create the map
       var mapOptions = {
         center: new google.maps.LatLng(38.6272, -90.1978),
         zoom: defaultZoom,
         mapTypeId: google.maps.MapTypeId.ROADMAP
       };
-  
-      // create the map              
+
+      // create the map
       var container = this.$.mapContainer;
-      
-      console.log(container);
 
       // create map and bounds
       this.map = new google.maps.Map(container, mapOptions);
-      
-      console.log('here');
-      
-      
+
     },
-    
+
     /**
      * Sets the location on the map (this.map) to the current address (this.address)
      */
     setLocation: function() {
-    
+
       // look for a default address
       if (this.address != null && this.address != undefined) {
-  
+
         // geo-code the address
         var geocoder = new google.maps.Geocoder();
-  
+
         var context = this;
-  
+
         geocoder.geocode({
           'address': this.address
         }, function(results, status) {
-  
+
           if (status == google.maps.GeocoderStatus.OK) {
-  
+
             var latitude = results[0].geometry.location.lat();
             var longitude = results[0].geometry.location.lng();
             var content = results[0].formatted_address;
-  
+
             var coords = new google.maps.LatLng(latitude, longitude);
-  
+
             var infowindow = new google.maps.InfoWindow({
               content: content
             });
-  
-            // create marker				    
+
+            // create marker
             var marktext = '<div>' + content + '</div>';
-  
+
             var marker = new google.maps.Marker({
               position: coords,
               map: context.map,
               title: marktext
             });
-  
+
             google.maps.event.addListener(marker, 'click', function() {
               infowindow.open(map, marker);
             });
-  
-  
+
+
             context.map.setCenter(coords);
-  
+
           }
-  
+
         });
-  
+
       }
-      
+
     },
-    
+
     /**
      * Translates the string
      */
     i18n: function(text) {
-    
+
       if(respond.site.i18n) {
         return respond.site.i18n(text);
       }
-    
-      
+
+
     }
-  
+
   });
 
 </script>
