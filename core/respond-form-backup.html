@@ -1,7 +1,7 @@
 <dom-module id="respond-form">
 
 	<style>
-     
+
     /* messages */
 		.success, .error{
 			display: none;
@@ -11,23 +11,23 @@
 			font-size: 16px;
 			margin: 0 0 0 15px;
 		}
-		
+
 			.success[visible], .error[visible]{
 				display: inline-block;
 			}
-			
+
 		.error{
 			border: 1px solid #CF4647;
 			color: #fff;
 			background-color: #CF4647;
 		}
-		
+
 		.success{
 			border: 1px solid #08B168;
 			color: #fff;
 			background-color: #08B168;
 		}
-		
+
 		/* loading */
 		.loading{
 			display: none;
@@ -38,11 +38,11 @@
 			margin-top: 5px;
 			margin-left: 5px;
 		}
-		
+
 			.loading[visible]{
 				display: inline-block;
 			}
-			
+
 			.loading svg{
 				display: block;
 				vertical-align: top;
@@ -56,14 +56,16 @@
 			  	text-align: center;
 			  	fill: currentColor;
 			}
+
+
 	</style>
 
 	<template>
 
     <div class="respond-container">
 
-	    	<form id$="{{formid}}">
-	    		<div id="fields"></div>
+	    	<form id$="{{id}}">
+	    		<content id="content"></content>
 
 	    		<button type="button" class="btn btn-primary" on-click="submitForm">{{submit}}</button>
 
@@ -88,7 +90,7 @@
 <script>
   Polymer({
 	  	is: "respond-form",
-	  	
+
 	  	// element attributes
 	  	properties: {
   	  	id: { type: String },
@@ -105,36 +107,28 @@
 	  			value: 'Submit'
 	  		}
 		},
-		
+
 		// attached
 		ready: function() {
-			
-			
-      if(document.body.hasAttribute('edit')) {
-        this.edit = true;
-      }
-      
+
       // defaults
 			this.loading = false;
 			this.showSuccess = false;
 			this.showError = false;
-			
+
 			// set fields
 			this.fields = [];
-			
+
 			// translate messages
 			this.success = this.i18n(this.success);
 			this.error = this.i18n(this.error);
 			this.submit = this.i18n(this.submit);
-			
-			// build form
-			this.buildForm();
-			
+
 		},
-		
+
 		// handles the form submit
 		submitForm: function(event, detail, sender) {
-		
+
 			// init messages
 			this.showSuccess = false;
 			this.showError = false;
@@ -247,98 +241,53 @@
 
 			// send serialized data
 			xhr.send(JSON.stringify(submission));
-						
+
 		},
-		
+
 		// clears the form on submit
 		clearForm:function() {
-		
+
 			// clear text fields
 			var els = Polymer.dom(this).querySelectorAll('input[type=text]');
-			
+
 			for(x=0; x<els.length; x++){
 				els[x].value = '';
 			}
-			
+
 			// clear text ares
 			var els = this.querySelectorAll('textarea');
-			
+
 			for(x=0; x<els.length; x++){
 				els[x].value = '';
 			}
-			
+
 			// clear checkboxes
 			var els = Polymer.dom(this).querySelectorAll('input[type=checkbox]');
-			
+
 			for(x=0; x<els.length; x++){
 				els[x].checked = false;
 			}
-			
+
 			// clear radios
 			var els = Polymer.dom(this).querySelectorAll('input[type=radio]');
-			
+
 			for(x=0; x<els.length; x++){
 				els[x].checked = false;
 			}
-			
+
 			// reset selects
 			var els = Polymer.dom(this).querySelectorAll('select');
-			
+
 			for(x=0; x<els.length; x++){
 				els[x].selectedIndex = 0;
 			}
-			
+
 		},
-		
-    // builds the form
-		buildForm: function() {
-		
-  		var context = this, json;
-  		
-      // submit form
-      var xhr = new XMLHttpRequest();
-      
-      // set URI
-      var uri = 'data/forms/' + this.id + '.json';
-      
-      xhr.open('GET', uri, true);
-      
-      xhr.onload = function() {
-      
-        if (xhr.status === 200) {
-          json = JSON.parse(xhr.responseText);
-          context.fields = json.fields;
-        
-          for(x=0; x<context.fields.length; x++) {
-            // create a list item
-            var item = document.createElement('respond-form-field');
-            item.setAttribute('fieldid', context.fields[x].id);
-            item.setAttribute('label', context.fields[x].label);
-            item.setAttribute('type', context.fields[x].type);
-            item.setAttribute('required', context.fields[x].required);
-            item.setAttribute('options', context.fields[x].options);
-            item.setAttribute('helperText', context.fields[x].helperText);
-            item.setAttribute('placeholder', context.fields[x].placeholder);
-            item.setAttribute('cssClass', context.fields[x].cssClass);
-            
-            // append list item to the dom
-            Polymer.dom(context.$.fields).appendChild(item);
-          }
-          
-        } 
-        else if (xhr.status !== 200) {
-          context.loading = false;
-          console.log('[respond.error] respond-list-blog component: failed post, xhr.status=' + xhr.status);
-        }
-        
-      };
-      
-      // send request
-      xhr.send();
-		},
-		
+
+    // handles translations
 		i18n: function(text) {
 			return respond.site.i18n(text);
 		}
+
 	});
 </script>

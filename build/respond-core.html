@@ -1202,7 +1202,7 @@
 </script><dom-module id="respond-form" assetpath="core/">
 
 	<style>
-
+     
     /* messages */
 		.success, .error{
 			display: none;
@@ -1212,23 +1212,23 @@
 			font-size: 16px;
 			margin: 0 0 0 15px;
 		}
-
+		
 			.success[visible], .error[visible]{
 				display: inline-block;
 			}
-
+			
 		.error{
 			border: 1px solid #CF4647;
 			color: #fff;
 			background-color: #CF4647;
 		}
-
+		
 		.success{
 			border: 1px solid #08B168;
 			color: #fff;
 			background-color: #08B168;
 		}
-
+		
 		/* loading */
 		.loading{
 			display: none;
@@ -1239,11 +1239,11 @@
 			margin-top: 5px;
 			margin-left: 5px;
 		}
-
+		
 			.loading[visible]{
 				display: inline-block;
 			}
-
+			
 			.loading svg{
 				display: block;
 				vertical-align: top;
@@ -1257,16 +1257,14 @@
 			  	text-align: center;
 			  	fill: currentColor;
 			}
-
-
 	</style>
 
 	<template>
 
     <div class="respond-container">
 
-	    	<form id$="{{id}}">
-	    		<content id="content"></content>
+	    	<form id$="{{formid}}">
+	    		<div id="fields"></div>
 
 	    		<button type="button" class="btn btn-primary" on-click="submitForm">{{submit}}</button>
 
@@ -1291,7 +1289,7 @@
 <script>
   Polymer({
 	  	is: "respond-form",
-
+	  	
 	  	// element attributes
 	  	properties: {
   	  	id: { type: String },
@@ -1308,28 +1306,36 @@
 	  			value: 'Submit'
 	  		}
 		},
-
+		
 		// attached
 		ready: function() {
-
+			
+			
+      if(document.body.hasAttribute('edit')) {
+        this.edit = true;
+      }
+      
       // defaults
 			this.loading = false;
 			this.showSuccess = false;
 			this.showError = false;
-
+			
 			// set fields
 			this.fields = [];
-
+			
 			// translate messages
 			this.success = this.i18n(this.success);
 			this.error = this.i18n(this.error);
 			this.submit = this.i18n(this.submit);
-
+			
+			// build form
+			this.buildForm();
+			
 		},
-
+		
 		// handles the form submit
 		submitForm: function(event, detail, sender) {
-
+		
 			// init messages
 			this.showSuccess = false;
 			this.showError = false;
@@ -1442,54 +1448,99 @@
 
 			// send serialized data
 			xhr.send(JSON.stringify(submission));
-
+						
 		},
-
+		
 		// clears the form on submit
 		clearForm:function() {
-
+		
 			// clear text fields
 			var els = Polymer.dom(this).querySelectorAll('input[type=text]');
-
+			
 			for(x=0; x<els.length; x++){
 				els[x].value = '';
 			}
-
+			
 			// clear text ares
 			var els = this.querySelectorAll('textarea');
-
+			
 			for(x=0; x<els.length; x++){
 				els[x].value = '';
 			}
-
+			
 			// clear checkboxes
 			var els = Polymer.dom(this).querySelectorAll('input[type=checkbox]');
-
+			
 			for(x=0; x<els.length; x++){
 				els[x].checked = false;
 			}
-
+			
 			// clear radios
 			var els = Polymer.dom(this).querySelectorAll('input[type=radio]');
-
+			
 			for(x=0; x<els.length; x++){
 				els[x].checked = false;
 			}
-
+			
 			// reset selects
 			var els = Polymer.dom(this).querySelectorAll('select');
-
+			
 			for(x=0; x<els.length; x++){
 				els[x].selectedIndex = 0;
 			}
-
+			
 		},
-
-    // handles translations
+		
+    // builds the form
+		buildForm: function() {
+		
+  		var context = this, json;
+  		
+      // submit form
+      var xhr = new XMLHttpRequest();
+      
+      // set URI
+      var uri = 'data/forms/' + this.id + '.json';
+      
+      xhr.open('GET', uri, true);
+      
+      xhr.onload = function() {
+      
+        if (xhr.status === 200) {
+          json = JSON.parse(xhr.responseText);
+          context.fields = json.fields;
+        
+          for(x=0; x<context.fields.length; x++) {
+            // create a list item
+            var item = document.createElement('respond-form-field');
+            item.setAttribute('fieldid', context.fields[x].id);
+            item.setAttribute('label', context.fields[x].label);
+            item.setAttribute('type', context.fields[x].type);
+            item.setAttribute('required', context.fields[x].required);
+            item.setAttribute('options', context.fields[x].options);
+            item.setAttribute('helperText', context.fields[x].helperText);
+            item.setAttribute('placeholder', context.fields[x].placeholder);
+            item.setAttribute('cssClass', context.fields[x].cssClass);
+            
+            // append list item to the dom
+            Polymer.dom(context.$.fields).appendChild(item);
+          }
+          
+        } 
+        else if (xhr.status !== 200) {
+          context.loading = false;
+          console.log('[respond.error] respond-list-blog component: failed post, xhr.status=' + xhr.status);
+        }
+        
+      };
+      
+      // send request
+      xhr.send();
+		},
+		
 		i18n: function(text) {
 			return respond.site.i18n(text);
 		}
-
 	});
 </script><dom-module id="respond-form-field" assetpath="core/">
 	<template>
@@ -1951,57 +2002,7 @@
 </script><dom-module id="respond-gallery" assetpath="core/">
 	<style>
 
-  	.respond-edit, .respond-container {
-    	display: none;
-  	}
-
-  	.respond-edit[visible], .respond-container[visible] {
-    	display: block;
-    	visibility: visible;
-  	}
-
-		/* edit display */
-    .respond-edit {
-      position: relative;
-      padding: 10px 0;
-      margin: 0;
-      min-height: 70px;
-      background-color: #f8f8f8;
-      border: 1px solid #f0f0f0;
-      text-align: center;
-    }
-
-    .respond-edit .icon {
-      display: inline-block;
-      text-align: center;
-      color: #ddd;
-    }
-
-    .respond-edit svg {
-      fill: currentColor;
-      width: 35px;
-      height: 35px;
-    }
-
-    .respond-edit .title {
-      font-family: 'Open Sans', sans-serif;
-      font-weight: normal;
-      font-size: 14px;
-      display: block;
-      margin: 0 0 10px 0;
-      color: #555;
-    }
-
-    .respond-edit .description {
-      font-family: 'Open Sans', sans-serif;
-      font-weight: normal;
-      font-size: 12px;
-      display: block;
-      margin: 5px 0 10px 0;
-      padding: 0;
-      color: #888;
-    }
-
+  	/* container */
 		.respond-container {
 			margin-bottom: 25px;
 		}
@@ -2017,31 +2018,67 @@
 			width: 200px;
 			height: 200px;
 		}
-
+		
+		/* modal */
+		.respond-modal{
+		    display: none;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.9) none repeat scroll 0 0;
+        overflow: hidden;
+        position: fixed;
+        z-index: 99999999;
+        top:0;
+        left: 0;
+    }
+    
+      .respond-modal[visible]{
+        display: flex;
+      }
+    
+    .respond-modal-body{
+        max-width: 75%;
+    }
+    
+    .respond-modal-close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      cursor: pointer;
+    }
+    
 	</style>
 
 	<template>
 
-	  <div class="respond-edit" visible$="{{edit}}">
-
-      <span class="icon"><svg xmlns="http://www.w3.org/2000/svg" fill="#000000" height="24" viewBox="0 0 24 24" width="24">
-          <path d="M0 0h24v24H0z" fill="none"></path>
-          <path d="M22 16V4c0-1.1-.9-2-2-2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2zm-11-4l2.03 2.71L16 11l4 5H8l3-4zM2 6v14c0 1.1.9 2 2 2h14v-2H4V6H2z"></path>
-      </svg></span>
-
-      <span class="title">Gallery Component</span>
-
-    </div>
-    
-
-		<div id$="{{id}}" class="respond-container" visible$="{{!edit}}">
+		<div id$="{{id}}" class="respond-container">
 
 			<div id="galleryList" role="listbox"></div>
 			
 
 		</div>
 		
-
+		
+		
+    <div class="respond-modal" visible$="{{showModal}}">
+    
+        <div class="respond-modal-close" on-click="close">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="#FFFFFF" height="24" viewBox="0 0 24 24" width="24">
+            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path>
+            <path d="M0 0h24v24H0z" fill="none"></path>
+          </svg>
+        </div>
+        
+    
+        <div class="respond-modal-body">
+            <img src$="{{src}}">        
+        </div>
+        
+        
+    </div>
+    
 
 	</template>
 </dom-module>
@@ -2057,53 +2094,79 @@
 
 		ready: function() {
 
-  		// edit mode
-      this.edit = false;
+      this.showModal = false;
+      this.src = '';
+      this.images = [];
 
-      if(document.body.hasAttribute('edit')) {
-        this.edit = true;
-      }
-
-			// get images
-			var images = Polymer.dom(this).querySelectorAll('img');
-
-			for(x=0; x<images.length; x++){
-
-				// set active
-				var active = '';
-
-				if(x==0){
-					active = ' active';
-				}
-
-				// get caption
-				var caption = images[x].getAttribute('data-caption') || '';
-
-				// get thumb
-				var thumb = images[x].getAttribute('data-thumb') || '';
-
-				// create a gallery image
-				var a = document.createElement('a');
-
-				a.setAttribute('title', caption);
-				a.setAttribute('class', 'gallery-item');
-				a.setAttribute('respond-lightbox', '');
-				a.setAttribute('href', images[x].src);
-
-				var img = document.createElement('img');
-				img.setAttribute('src', thumb);
-
-				a.appendChild(img);
-
-				// append gallery image to list
-				Polymer.dom(this.$.galleryList).appendChild(a);
-
-			}
+			this.buildGallery();
 
 		},
+		
+		buildGallery: function() {
+  		
+  		var context = this, json;
+  		
+      // submit form
+      var xhr = new XMLHttpRequest();
+      
+      // set URI
+      var uri = 'data/galleries/' + this.id + '.json';
+      
+      xhr.open('GET', uri, true);
+      
+      xhr.onload = function() {
+      
+        if (xhr.status === 200) {
+          json = JSON.parse(xhr.responseText);
+          context.images = json.images;
+          
+          for(x=0; x<context.images.length; x++) {
+          
+            // create a gallery image
+    				var a = document.createElement('a');
+    
+    				a.setAttribute('title', context.images[x].caption);
+    				a.setAttribute('class', 'gallery-item');
+    				a.setAttribute('href', context.images[x].url);
+    
+    				var img = document.createElement('img');
+    				img.setAttribute('src', context.images[x].thumb);
+    
+    				a.appendChild(img);
+    				
+    				a.addEventListener('click', function(e) {
+      				
+      				context.showModal = true;
+      				context.src = e.target.parentNode.getAttribute('href');
+      				
+      				e.preventDefault();
+      				
+    				});
+    
+    				// append gallery image to list
+    				Polymer.dom(context.$.galleryList).appendChild(a);
 
-		i18n: function(text){
-		  	return respond.site.i18n(text);
+          }
+          
+        } 
+        else if (xhr.status !== 200) {
+          context.loading = false;
+          console.log('[respond.error] respond-list-blog component: failed post, xhr.status=' + xhr.status);
+        }
+        
+      };
+      
+      // send request
+      xhr.send();
+  		
+		},
+		
+		close: function() {
+		  this.showModal = false;
+		},
+
+		i18n: function(text) {
+		  return respond.site.i18n(text);
 		}
 
 	});
